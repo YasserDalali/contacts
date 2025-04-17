@@ -7,7 +7,7 @@ const configureExpress = (app) => {
     app.use(express.urlencoded({ extended: true }));
     
     // Apply Arcjet protection to all routes
-    app.use(arcjetMiddleware);
+    /* app.use(arcjetMiddleware); */
     
     // Static files
     app.use(express.static('public'));

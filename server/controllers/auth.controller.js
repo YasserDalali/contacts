@@ -1,14 +1,8 @@
-import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-import { JWT_EXPIRE, JWT_SECRET } from '../config/config.js';
-import userModel from '../models/User.model.js';
 import mongoose from 'mongoose';
+import User from '../models/User.model.js';
+import generateToken from "../utils/jwtsign.js"
 
-const generateToken = (user) => {
-    return jwt.sign({ userId: user._id }, JWT_SECRET, {
-        expiresIn: JWT_EXPIRE,
-    });
-};
 
 class AuthController {
     static async register(req, res) {
@@ -18,11 +12,11 @@ class AuthController {
             const { username, email, password } = req.body;
             
             if (!(username && email && password)) {
-                throw new Error("Fill all fields");
+                throw new Error("Fill all fields (username, email, password)");
             }
 
-            const existingEmail = await userModel.findOne({ email: email });
-            const existingUsername = await userModel.findOne({ username: username });
+            const existingEmail = await User.findOne({ email: email });
+            const existingUsername = await User.findOne({ username: username });
             
             if (existingEmail || existingUsername) {
                 throw new Error("Username/Email already taken");
@@ -31,7 +25,7 @@ class AuthController {
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
             
-            const newUser = await userModel.create([{
+            const newUser = await User.create([{
                 username,
                 email,
                 password: hashedPassword,
@@ -63,10 +57,10 @@ class AuthController {
             const { email, password } = req.body;
             
             if (!(email && password)) {
-                throw new Error("Fill all fields");
+                throw new Error("Fill all fields (email, password)");
             }
             
-            const user = await userModel.findOne({ email: email });
+            const user = await User.findOne({ email: email });
             if (!user) {
                 throw new Error("No user found");
             }
