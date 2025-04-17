@@ -1,29 +1,96 @@
-const authSignIn = (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-        return res.status(400).json({ message: "Email and password are required" });
+import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
+import { JWT_EXPIRE, JWT_SECRET } from '../config/config.js';
+import userModel from '../models/User.model.js';
+import mongoose from 'mongoose';
+
+const generateToken = (user) => {
+    return jwt.sign({ userId: user._id }, JWT_SECRET, {
+        expiresIn: JWT_EXPIRE,
+    });
+};
+
+class AuthController {
+    static async register(req, res) {
+        const session = await mongoose.startSession();
+        try {
+            session.startTransaction();
+            const { username, email, password } = req.body;
+            
+            if (!(username && email && password)) {
+                throw new Error("Fill all fields");
+            }
+
+            const existingEmail = await userModel.findOne({ email: email });
+            const existingUsername = await userModel.findOne({ username: username });
+            
+            if (existingEmail || existingUsername) {
+                throw new Error("Username/Email already taken");
+            }
+
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+            
+            const newUser = await userModel.create([{
+                username,
+                email,
+                password: hashedPassword,
+                joining_date: new Date()
+            }], { session });
+
+            const token = generateToken(newUser[0]);
+            
+            await session.commitTransaction();
+            res.status(201).json({
+                message: "Success",
+                data: {
+                    user: newUser[0],
+                    token: token
+                }
+            });
+        } catch (error) {
+            await session.abortTransaction();
+            res.status(400).json({
+                message: error.message || "Registration failed"
+            });
+        } finally {
+            await session.endSession();
+        }
+    }   
+
+    static async login(req, res) {
+        try {
+            const { email, password } = req.body;
+            
+            if (!(email && password)) {
+                throw new Error("Fill all fields");
+            }
+            
+            const user = await userModel.findOne({ email: email });
+            if (!user) {
+                throw new Error("No user found");
+            }
+
+            const passValid = await bcrypt.compare(password, user.password);
+            if (!passValid) {
+                throw new Error("Invalid password");
+            }
+
+            const token = generateToken(user);
+            res.status(200).json({
+                message: "Login successful",
+                data: {
+                    user: user,
+                    token: token
+                }
+            });
+            
+        } catch (error) {
+            res.status(401).json({
+                message: error.message || "Login failed"
+            });
+        }
     }
-
-    // fill in the logic to check if the user exists in the database and if the password is correct
-    // if not, return a 401 status code with an error message
-    // if the user exists and the password is correct, return a success message and a token
-    // for now, we will just return a success message
-
-    res.send("test passed");
-}
-const authSignUp = (req, res) => {
-    const { username, email, password } = req.body;
-    if (!email || !password || !username) {
-        return res.status(400).json({ message: "Email, username and password are required" });
-    }
-    // fill in the logic to check if the user already exists in the database
-    // if the user already exists, return a 409 status code with an error message   
-    // if the user does not exist, create a new user in the database and return a success message and a token
-    // you can also use bcrypt to hash the password before saving it to the database
-    // and use jsonwebtoken to create a token for the user
-    // for now, we will just return a success message
-
-    res.send("test passed");
 }
 
-export { authSignIn, authSignUp };
+export default AuthController
