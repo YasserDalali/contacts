@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: userData.name, // Convert name to username
+          username: userData.name, // Convert name to username for the server
           email: userData.email,
           password: userData.password
         }),
