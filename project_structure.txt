@@ -1,0 +1,38 @@
+Project Structure Layout
+====================
+
+📁 Root Directory
+├── 📁 client/
+│   ├── 📁 src/
+│   ├── 📁 public/
+│   ├── 📄 index.html
+│   ├── 📄 vite.config.js
+│   ├── 📄 tailwind.config.js
+│   ├── 📄 eslint.config.js
+│   ├── 📄 package.json
+│   ├── 📄 Dockerfile
+│   └── 📄 README.md
+│
+├── 📁 server/
+│   ├── 📁 config/
+│   ├── 📁 controllers/
+│   ├── 📁 middlewares/
+│   ├── 📁 models/
+│   ├── 📁 routes/
+│   ├── 📁 utils/
+│   ├── 📁 public/
+│   ├── 📄 app.js
+│   ├── 📄 package.json
+│   ├── 📄 Dockerfile
+│   ├── 📄 .env.example
+│   ├── 📄 API_TESTS.md
+│   └── 📄 README.md
+│
+├── 📄 package.json
+├── 📄 cahierdecharge.md
+└── 📄 .gitignore
+
+Note:
+- 📁 represents directories
+- 📄 represents files
+- Some common configuration files and node_modules are omitted for clarity 
