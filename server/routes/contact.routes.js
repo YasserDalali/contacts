@@ -1,12 +1,13 @@
 import { Router } from "express";
 import ContactController from "../controllers/contact.controller.js";
+import AuthMiddleware from "../middlewares/auth.middleware.js";
 
 const contactRouter = Router();
-contactRouter.get("/", ContactController.getAllContacts)
-contactRouter.get("/:id", ContactController.getContactById)
-contactRouter.post("/", ContactController.createContact)
-contactRouter.delete("/:id", ContactController.addNote)
-contactRouter.put("/:id/edit", ContactController.addNote)
-contactRouter.put("/contact/:id/addnote", ContactController.addNote)
+contactRouter.get("/", AuthMiddleware.authz, ContactController.getAllContacts) // ✅
+contactRouter.get("/:id", AuthMiddleware.authz, ContactController.getContactById) 
+contactRouter.post("/", AuthMiddleware.authz, ContactController.createContact) // ✅
+contactRouter.delete("/:id", AuthMiddleware.authz, ContactController.addNote)
+contactRouter.put("/:id/edit", AuthMiddleware.authz, ContactController.addNote)
+contactRouter.put("/contact/:id/addnote", AuthMiddleware.authz, ContactController.addNote)
 
 export default contactRouter;

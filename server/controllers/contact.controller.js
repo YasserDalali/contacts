@@ -6,7 +6,7 @@ class ContactController {
         const session = await mongoose.startSession();
         try {
             session.startTransaction();
-            const { name, email = "", notes = [] } = req.body;
+            const { name, phone = "", email = "", notes = [] } = req.body;
             const userId = req.user._id; // From auth middleware
             
             if (!name) {
@@ -15,13 +15,15 @@ class ContactController {
 
             const existingEmail = email ? await Contact.findOne({ email, userId }) : null;
             const existingName = await Contact.findOne({ name, userId });
+            const existingPhone = await Contact.findOne({ phone, userId });
             
-            if (existingEmail || existingName) {
-                throw new Error("Name/Email already exists for this user");
+            if (existingEmail || existingName || existingPhone) {
+                throw new Error("Name/Email/Phone already exists for this user");
             }
 
             const newContact = await Contact.create([{
                 name,
+                phone,
                 email,
                 notes,
                 userId,
