@@ -160,7 +160,6 @@ class ContactController {
       const contact = await Contact.findOne({
         _id: contactId,
         userId: userId,
-        
       });
 
       if (!contact) {
@@ -179,28 +178,44 @@ class ContactController {
   }
 
   static async aisummarize(req, res) {
-    const contact = await getContactById(req, res);
-    if (!contact) {
-      return res.status(404).json({ message: "Contact not found" });
-    }
-    if (!contact.notes || contact.notes.length === 0) {
-      return res.status(400).json({ message: "No notes to summarize" });
-    }
-    const notes = contact.notes.join("\n");
-    const prompt = `Summarize the following notes:\n`;
-    const data = `\n${notes}`;
-    execPrompt(prompt, data, reSchema)
-      .then((summary) => {
-        res.status(200).json({
-          message: "Summary generated successfully",
-          data: summary,
-        });
-      })
-      .catch((error) => {
-        res.status(500).json({
-          message: error.message || "Failed to generate summary",
-        });
+    try {
+      const userId = req.user._id;
+      const contactId = req.params.id;
+
+      const contact = await Contact.findOne({
+        _id: contactId,
+        userId: userId,
       });
+
+      if (!contact) {
+        return res.status(404).json({ message: "Contact not found" });
+      }
+      if (!contact.notes || contact.notes.length === 0) {
+        return res.status(400).json({ message: "No notes to summarize" });
+      }
+
+      const notes = contact.notes.join("\n");
+      const prompt = `"Summarize the following contact information in a concise and clear manner with some analysis, highlighting any key details related to the individual's situation or needs. the answer should be plain text, directly give me the answer without styling nor introductions":\n`;
+      const data = `\n${notes}`;
+      console.log("Prompt:", prompt, "data:", data);
+      
+      execPrompt(prompt, data)
+        .then((summary) => {
+          res.status(200).json({
+            message: "Summary generated successfully",
+            data: summary,
+          });
+        })
+        .catch((error) => {
+          res.status(500).json({
+            message: error.message || "Failed to generate summary",
+          });
+        });
+    } catch (error) {
+      res.status(400).json({
+        message: error.message || "Failed to retrieve contact",
+      });
+    }
   }
 }
 

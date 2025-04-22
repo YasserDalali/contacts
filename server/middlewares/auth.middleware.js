@@ -31,7 +31,7 @@ class AuthMiddleware {
 
       console.log("\x1b[33m%s\x1b[0m", "---------------------------------------");
       console.log("action done by user:", user.username); // Debugging line to check the user details
-
+      
       next();
     } catch (err) {
       return res.status(401).json({ error: `Invalid token, ${err}` });
