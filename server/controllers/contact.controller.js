@@ -159,9 +159,8 @@ class ContactController {
 
       const contact = await Contact.findOne({
         _id: contactId,
-        userId: {
-          $oid: userId,
-        },
+        userId: userId,
+        
       });
 
       if (!contact) {

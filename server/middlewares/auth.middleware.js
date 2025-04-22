@@ -19,10 +19,10 @@ class AuthMiddleware {
 
     try {
       const decoded = jwt.verify(token, JWT_SECRET);
+      console.log("\x1b[33m%s\x1b[0m", decoded); // Debugging line to check the decoded token
 
-      
       const user = await User.findById(decoded.userId);
-      
+      console.log("\x1b[33m%s\x1b[0m", user); // Debugging line to check the user details
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
