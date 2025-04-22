@@ -1,5 +1,6 @@
 import Contact from "../models/Contact.model.js";
 import mongoose from "mongoose";
+import execPrompt from "../services/Gemini.service.js";
 
 class ContactController {
   static async createContact(req, res) {
@@ -176,6 +177,31 @@ class ContactController {
         message: error.message || "Failed to retrieve contact",
       });
     }
+  }
+
+  static async aisummarize(req, res) {
+    const contact = await getContactById(req, res);
+    if (!contact) {
+      return res.status(404).json({ message: "Contact not found" });
+    }
+    if (!contact.notes || contact.notes.length === 0) {
+      return res.status(400).json({ message: "No notes to summarize" });
+    }
+    const notes = contact.notes.join("\n");
+    const prompt = `Summarize the following notes:\n`;
+    const data = `\n${notes}`;
+    execPrompt(prompt, data, reSchema)
+      .then((summary) => {
+        res.status(200).json({
+          message: "Summary generated successfully",
+          data: summary,
+        });
+      })
+      .catch((error) => {
+        res.status(500).json({
+          message: error.message || "Failed to generate summary",
+        });
+      });
   }
 }
 

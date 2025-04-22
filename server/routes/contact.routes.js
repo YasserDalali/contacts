@@ -9,5 +9,6 @@ contactRouter.post("/", AuthMiddleware.authz, ContactController.createContact) /
 contactRouter.delete("/:id", AuthMiddleware.authz, ContactController.deleteContact)
 contactRouter.put("/:id/edit", AuthMiddleware.authz, ContactController.editContact)
 contactRouter.put("/contact/:id/addnote", AuthMiddleware.authz, ContactController.addNote)
+contactRouter.get("/contact/:id/summarize", AuthMiddleware.authz, ContactController.aisummarize)
 
 export default contactRouter;
