@@ -1,31 +1,21 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import PrivateRoute from './components/auth/PrivateRoute';
-import Dashboard from './pages/Dashboard';
+import Home from "./pages/Home";
+import Login from './pages/Login.jsx'
+import Register from './pages/Register.jsx'
+import Contacts from './pages/Contacts.jsx'
+import Contact from './pages/Contact.jsx'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="min-h-screen bg-gray-100">
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route
-              path="/dashboard"
-              element={
-                <PrivateRoute>
-                  <Dashboard />
-                </PrivateRoute>
-              }
-            />
-            <Route path="/" element={<Navigate to="/login" replace />} />
-          </Routes>
-        </div>
-      </Router>
-    </AuthProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />}></Route>
+        <Route path="/login" element={<Login />}></Route>
+        <Route path="/register" element={<Register />}></Route>
+        <Route path="/contacts" element={<Contacts />}></Route>
+        <Route path="/contact" element={<Contact />}></Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
